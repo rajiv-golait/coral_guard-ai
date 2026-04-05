@@ -8,7 +8,7 @@
 | `Dockerfile` + dynamic **`PORT`** | Yes (required by Render) |
 | `render.yaml` Blueprint | Yes (optional one-click shape) |
 | **Weights + tabular files** in Git | **Yes** — `efficientnet_b3_best.pth`, `dbscan_model.pkl`, `ann_fusion_best.pth`, `features.pkl`, `scaler.pkl`, `X_train.npy` are tracked so the image build includes them (no manual disk upload unless you choose to strip them again). |
-| **RAM** | PyTorch + CNN is heavy — **avoid Free** if you see OOM; use **Starter** or higher |
+| **RAM** | **Free** works for many stacks; this app uses PyTorch + CNN — if the service **crashes or 502s**, upgrade to **Starter** (paid). |
 
 If you **removed** artifacts from Git for a slimmer clone, use a **persistent disk** (as below) or restore files on the host before serving traffic.
 
@@ -37,10 +37,11 @@ If you **removed** artifacts from Git for a slimmer clone, use a **persistent di
 
 ---
 
-## Free tier warning
+## Free tier (default in `render.yaml`)
 
-- **512 MB RAM** is often **not enough** for `torch` + EfficientNet-B3 + requests.
-- If the service **crashes or 502s** during import or first inference, upgrade to **Starter** or higher.
+- **No paid instance** — Blueprint should not ask for a card for `plan: free` (workspace policies may vary; see [Render free docs](https://docs.render.com/docs/free)).
+- **512 MB RAM** may be tight for `torch` + EfficientNet-B3; if builds fail or the app OOMs, switch `plan:` to `starter` in `render.yaml` (requires payment method on file).
+- **Cold starts** after ~15 min idle are normal on free web services.
 
 ---
 

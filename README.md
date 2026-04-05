@@ -254,7 +254,7 @@ docker run --rm -p 8000:8000 --env-file .env `
 
 **Ready:** `Dockerfile` uses **`PORT`**, copies **`data/tabular`** into the image, and models ship under **`app/models/`** in Git. `render.yaml` is Docker + health check; add **`GROQ_API_KEY`** in the dashboard.
 
-Use at least **Starter** RAM for PyTorch if **Free** OOMs.
+`render.yaml` uses **`plan: free`** (no paid instance). If PyTorch OOMs or the service crashes, switch to **`plan: starter`** in `render.yaml` (paid).
 
 Full steps: **[docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md)**.
 
