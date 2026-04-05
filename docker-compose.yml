@@ -1,0 +1,18 @@
+# Local / server run with host-mounted secrets and ML artifacts.
+# From coralguard-api/:  docker compose up --build
+#
+# Ensure `.env` exists (copy from .env.example) and contains GROQ_API_KEY if you want LLM reports.
+# Ensure app/models/*.pth, *.pkl and data/tabular/* exist on the host (run scripts/sync_from_coralguard.ps1).
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./app/models:/app/app/models:ro
+      - ./data/tabular:/app/data/tabular:ro
+      - ./uploads:/app/uploads
+    restart: unless-stopped

@@ -1,0 +1,4 @@
+# Place trained artifacts here:
+# - efficientnet_b3_best.pth
+# - dbscan_model.pkl
+# - fusion_ann.pth

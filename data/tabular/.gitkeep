@@ -1,0 +1,3 @@
+# Copy from Colab output `CoralGuardAI/data/tabular/`:
+#   features.pkl, scaler.pkl, X_train.npy
+# Or set CORALGUARD_TABULAR_DIR in .env to that folder on disk.
