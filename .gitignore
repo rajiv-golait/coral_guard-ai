@@ -1,4 +1,4 @@
-# Secrets
+# Secrets — never commit
 .env
 .env.local
 .env.*.local
@@ -29,15 +29,13 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Large ML artifacts — do not push to public GitHub (use sync script or private LFS)
-# Remove these blocks only if you intentionally commit weights (private repo / Git LFS).
-app/models/*.pth
-app/models/*.pkl
-data/tabular/*.pkl
-data/tabular/*.npy
-
 # Jupyter
 .ipynb_checkpoints/
 
 # Logs
 *.log
+
+# Optional: ignore extra local-only artifacts (uncomment if needed)
+# data/tabular/X_val.npy
+# data/tabular/X_test.npy
+# data/tabular/y_*.npy

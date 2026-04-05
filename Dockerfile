@@ -1,6 +1,5 @@
-# CoralGuard AI API — production-style image (code + UI + static thesis figures).
-# Trained weights (.pth / .pkl) and tabular .npy/.pkl are often gitignored: mount them at run
-# (see docker-compose.yml) or copy into the build context before `docker build`.
+# CoralGuard AI API — production image (code, UI, thesis PNGs, bundled models + tabular).
+# Weights live under app/models/; tabular under data/tabular/ (tracked in Git for deploy).
 
 FROM python:3.11-slim-bookworm
 
@@ -19,12 +18,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
+COPY data ./data
 COPY frontend ./frontend
 COPY static ./static
 COPY artifacts ./artifacts
 
-# Writable upload dir; tabular + models supplied via bind mount or `docker cp`
-RUN mkdir -p /app/data/tabular /app/uploads /app/app/models
+RUN mkdir -p /app/uploads
 
 # Render and other PaaS set PORT; default 8000 for local Docker
 EXPOSE 8000

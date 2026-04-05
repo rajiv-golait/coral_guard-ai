@@ -62,25 +62,25 @@ coralguard-api/
 
 ## What ships in Git vs what stays local
 
-**Tracked in Git (typical clone):**
+**Intended to be in Git (clone-and-run):**
 
 - All Python and frontend source  
-- `static/thesis/figures/*.png` — thesis plots (EDA, confusion matrix, ROC, Grad-CAM, DBSCAN, ANN, ablation, …)  
+- **Inference artifacts** (so Render / teammates need no manual copy):  
+  - `app/models/efficientnet_b3_best.pth`, `dbscan_model.pkl`, `ann_fusion_best.pth`  
+  - `data/tabular/features.pkl`, `scaler.pkl`, `X_train.npy`  
+- `static/thesis/figures/*.png` — thesis plots  
 - `scripts/`, `Dockerfile`, `docker-compose.yml`, docs  
 
-**Ignored by `.gitignore` (large / sensitive — you copy or mount after clone):**
+**Never commit:**
 
-| Path | Contents |
-|------|----------|
-| `.env` | Secrets (`GROQ_API_KEY`) |
-| `app/models/*.pth` | CNN + fusion weights (~tens of MB) |
-| `app/models/*.pkl` | (reserved) |
-| `data/tabular/*.pkl` | `features.pkl`, `scaler.pkl` |
-| `data/tabular/*.npy` | `X_train.npy`, train/val/test splits |
+| Path | Why |
+|------|-----|
+| `.env` | Contains `GROQ_API_KEY` and other secrets — use `.env.example` only in Git |
 
-**Why:** Keeps the GitHub repo small and avoids leaking trained weights into public history. Your **local** tree after sync still has everything under `app/models/` and `data/tabular/` for running the server.
+**Optional local-only** (training / eval, not required for `POST /predict`):  
+`X_val.npy`, `X_test.npy`, `y_*.npy` — you can add them to Git too if you want; they are small.
 
-**To commit weights** (private repo or Git LFS): remove the matching lines from `.gitignore` and follow [Git LFS](https://git-lfs.github.com/) for files &gt; ~50 MB if needed.
+**Public GitHub note:** Pushing weights makes the trained CNN/fusion/DBSCAN bundle **public**. For a thesis that is often fine; for proprietary data, use a **private** repo.
 
 ---
 
@@ -252,9 +252,9 @@ docker run --rm -p 8000:8000 --env-file .env `
 
 ### Render ([render.com](https://render.com))
 
-**Mostly ready:** the `Dockerfile` listens on Render’s **`PORT`**, and `render.yaml` defines a Docker web service + **persistent disk** at `/data` for models/tabular.
+**Ready:** `Dockerfile` uses **`PORT`**, copies **`data/tabular`** into the image, and models ship under **`app/models/`** in Git. `render.yaml` is Docker + health check; add **`GROQ_API_KEY`** in the dashboard.
 
-**You still must** upload `*.pth`, `*.pkl`, and `X_train.npy` (and friends) onto that disk — they are **not** in Git. Use at least **Starter** RAM for PyTorch; free tier often **OOMs**.
+Use at least **Starter** RAM for PyTorch if **Free** OOMs.
 
 Full steps: **[docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md)**.
 
@@ -277,9 +277,8 @@ git push -u origin main
 
 **Before every push:**
 
-- `git status` — ensure `.env` is **not** staged.  
-- If you added real keys to `.env`, **rotate** them at the provider (see Security).  
-- Teammates run `sync_from_coralguard.ps1` or restore artifacts from secure storage after clone.
+- `git status` — ensure `.env` is **not** staged (artifacts **may** be staged — they are no longer gitignored).  
+- If you added real keys to `.env`, **rotate** them at the provider (see Security).
 
 ---
 

@@ -1,12 +1,7 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
-# Use: Dashboard → New → Blueprint → connect repo, or `render blueprint apply`
-#
-# BEFORE first successful inference you must place trained artifacts on the disk:
-#   /data/models/efficientnet_b3_best.pth, dbscan_model.pkl, ann_fusion_best.pth
-#   /data/tabular/features.pkl, scaler.pkl, X_train.npy
-# Options: Render Shell after deploy, rsync, or a one-time download script.
-#
-# PyTorch + EfficientNet-B3 needs RAM — free tier often OOMs; use at least Starter.
+# Models + tabular are in the Git repo and COPY’d into the Docker image.
+# Set GROQ_API_KEY in the dashboard (secret) for LLM reports.
+# PyTorch + EfficientNet-B3: use Starter+ if Free tier OOMs.
 
 version: "1"
 
@@ -19,19 +14,7 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health
-    disk:
-      name: coralguard-data
-      mountPath: /data
-      sizeGB: 2
     envVars:
-      - key: CORALGUARD_CNN_PATH
-        value: /data/models/efficientnet_b3_best.pth
-      - key: CORALGUARD_DBSCAN_PATH
-        value: /data/models/dbscan_model.pkl
-      - key: CORALGUARD_FUSION_PATH
-        value: /data/models/ann_fusion_best.pth
-      - key: CORALGUARD_TABULAR_DIR
-        value: /data/tabular
       - key: CORALGUARD_DEVICE
         value: cpu
       - key: GROQ_API_KEY

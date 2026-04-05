@@ -7,37 +7,18 @@
 | FastAPI + health route `/health` | Yes |
 | `Dockerfile` + dynamic **`PORT`** | Yes (required by Render) |
 | `render.yaml` Blueprint | Yes (optional one-click shape) |
-| **Weights + tabular files** in Git | **No** (`.gitignore`) — you **must** supply them on the server |
+| **Weights + tabular files** in Git | **Yes** — `efficientnet_b3_best.pth`, `dbscan_model.pkl`, `ann_fusion_best.pth`, `features.pkl`, `scaler.pkl`, `X_train.npy` are tracked so the image build includes them (no manual disk upload unless you choose to strip them again). |
 | **RAM** | PyTorch + CNN is heavy — **avoid Free** if you see OOM; use **Starter** or higher |
 
-So: **the app is ready to deploy as a service**, but **you still need to copy `app/models/*` and `data/tabular/*` onto Render** (persistent disk or another method) before `/predict` works end-to-end.
+If you **removed** artifacts from Git for a slimmer clone, use a **persistent disk** (as below) or restore files on the host before serving traffic.
 
 ---
 
-## Option A — Blueprint (Docker + disk)
+## Option A — Blueprint (Docker)
 
-1. Push this repo to GitHub (already done for [coral_guard-ai](https://github.com/rajiv-golait/coral_guard-ai)).
-2. Render Dashboard → **New** → **Blueprint**.
-3. Select the repo; Render reads `render.yaml`.
-4. In the dashboard, create an **environment variable** `GROQ_API_KEY` (mark secret) if you want LLM reports.
-5. After the first deploy, open **Shell** (paid instances) or use **SSH** if enabled, and create directories on the mounted disk:
-
-   ```bash
-   mkdir -p /data/models /data/tabular
-   ```
-
-6. Upload files from your laptop (same layout as local project):
-
-   - `/data/models/efficientnet_b3_best.pth`
-   - `/data/models/dbscan_model.pkl`
-   - `/data/models/ann_fusion_best.pth`
-   - `/data/tabular/features.pkl`
-   - `/data/tabular/scaler.pkl`
-   - `/data/tabular/X_train.npy`
-
-   Use Render’s docs for your workflow (shell + `curl` from a private URL, `scp`, CI artifact, etc.). **Do not** commit secrets or large blobs to a public repo.
-
-7. **Redeploy** or restart the service so the process picks up files (usually not required if files appear before requests).
+1. Push this repo to GitHub (weights and `data/tabular` are **in Git** so the image builds complete).
+2. Render Dashboard → **New** → **Blueprint** → select the repo.
+3. Add secret **`GROQ_API_KEY`** when prompted (optional for JSON-only inference).
 
 **URLs after deploy**
 
@@ -50,11 +31,9 @@ So: **the app is ready to deploy as a service**, but **you still need to copy `a
 ## Option B — Manual Web Service (no Blueprint)
 
 1. **New** → **Web Service** → connect repo.
-2. **Runtime:** Docker (use root `Dockerfile`) *or* Native Python:
-   - **Build:** `pip install -r requirements.txt`
-   - **Start:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-3. Add **environment variables** (same names as `.env.example`). Set paths to wherever you mount or copy artifacts (`/data/...` if using a disk).
-4. Attach a **persistent disk** and upload artifacts as in Option A.
+2. **Runtime:** Docker → `Dockerfile` at repo root.
+3. Add **`GROQ_API_KEY`** (secret) if you want LLM reports.
+4. Default paths in `.env.example` (`app/models/...`, `data/tabular`) work inside the container.
 
 ---
 
