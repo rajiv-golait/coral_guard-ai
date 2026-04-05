@@ -26,6 +26,7 @@ COPY artifacts ./artifacts
 # Writable upload dir; tabular + models supplied via bind mount or `docker cp`
 RUN mkdir -p /app/data/tabular /app/uploads /app/app/models
 
+# Render and other PaaS set PORT; default 8000 for local Docker
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

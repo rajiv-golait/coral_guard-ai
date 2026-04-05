@@ -250,6 +250,14 @@ docker run --rm -p 8000:8000 --env-file .env `
 4. Process manager: **systemd**, **Docker**, or **cloud run** with the same env + volumes.  
 5. Do **not** expose `.env` or upload directories to the public web root.
 
+### Render ([render.com](https://render.com))
+
+**Mostly ready:** the `Dockerfile` listens on Render’s **`PORT`**, and `render.yaml` defines a Docker web service + **persistent disk** at `/data` for models/tabular.
+
+**You still must** upload `*.pth`, `*.pkl`, and `X_train.npy` (and friends) onto that disk — they are **not** in Git. Use at least **Starter** RAM for PyTorch; free tier often **OOMs**.
+
+Full steps: **[docs/DEPLOY_RENDER.md](docs/DEPLOY_RENDER.md)**.
+
 ---
 
 ## Pushing to GitHub
