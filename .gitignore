@@ -1,0 +1,26 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/.env
+*.pyc
+*.pyo
+
+# Models (large files — download separately)
+backend/models/*.keras
+backend/models/*.pkl
+!backend/models/.gitkeep
+
+# Node
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+frontend/.env*.local
+!frontend/.env.local.example
+
+# Env secrets
+backend/.env
+!backend/.env.example
+
+# OS
+.DS_Store
+Thumbs.db
